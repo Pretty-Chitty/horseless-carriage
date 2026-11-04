@@ -1,0 +1,11 @@
+.env
+node_modules
+dist
+coverage
+docs
+build
+yarn 
+.DS_Store
+.ftpsettings.json
+state.json
+__pycache__

@@ -1,0 +1,8 @@
+{
+ "default": {
+  "maxWidth": 240,
+  "maxHeight": 240,
+  "format": "png",
+  "palette": true
+ }
+}

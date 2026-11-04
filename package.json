@@ -1,0 +1,36 @@
+{
+  "name": "HorselessCarriage",
+  "version": "1.0.0",
+  "main": "src/HorselessCarriage.ts",
+  "author": "Josh Breckman <jbreckman@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource/quicksand": "^5.2.10",
+    "@fontsource/roboto-slab": "5.1.0",
+    "@mui/icons-material": "5.18.0",
+    "@pretty-chitty/core": "2.1.0",
+    "color": "^4.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.158.0"
+  },
+  "devDependencies": {
+    "@pretty-chitty/cli": "2.1.0",
+    "@types/react": "^18.2.34",
+    "@types/react-dom": "^18.2.14",
+    "terser-webpack-plugin": "^5.6.1",
+    "typescript": "^5.9.0"
+  },
+  "scripts": {
+    "start": "pretty-chitty-cli watch",
+    "build": "pretty-chitty-cli build",
+    "deploy": "pretty-chitty-cli deploy",
+    "tutorial:check": "node scripts/tutorial/coverage.mjs && node scripts/tutorial/run.mjs check",
+    "tutorial:coverage": "node scripts/tutorial/coverage.mjs",
+    "tutorial:trace": "node scripts/tutorial/run.mjs trace",
+    "tutorial:search": "node scripts/tutorial/run.mjs search",
+    "tutorial:cues": "node scripts/tutorial/run.mjs cues",
+    "tutorial:audio": "node scripts/tutorial/audio.mjs",
+    "tutorial:voices": "node scripts/tutorial/voices.mjs"
+  }
+}

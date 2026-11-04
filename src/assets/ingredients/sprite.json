@@ -1,0 +1,13 @@
+{
+ "default": {
+  "maxWidth": 512,
+  "maxHeight": 512,
+  "format": "png",
+  "palette": true
+ },
+ "overrides": {
+  "paper|cardBack": {
+   "format": "jpg"
+  }
+ }
+}
