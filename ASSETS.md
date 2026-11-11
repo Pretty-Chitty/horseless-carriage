@@ -77,4 +77,8 @@ indicators 256, floors 80 px a square.
 - The board's Wealth Accumulation track is not shown: the $ spark is the score (developer, 2026-11-03).
 
 ## Still placeholder
-- Nothing on the table. Box art and the screenshot (`static/`) are Phase 14.
+- Nothing on the table.
+
+## Store images (`static/`)
+- `screenshot.jpg`: 1800×1050, q82 progressive, ~247 KB. A capture of the 4-player `/demo` at the
+  first human prompt (setup, starting departments), taken with the skill's `screenshot.mjs` (2026-11-10).

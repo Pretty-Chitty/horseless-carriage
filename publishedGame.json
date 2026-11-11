@@ -1,0 +1,63 @@
+{
+  "id": "horselesscarriage",
+  "major": 1,
+  "minPlayers": 3,
+  "maxPlayers": 5,
+  "configurationOptions": [
+    {
+      "fieldName": "variant",
+      "config": {
+        "label": "Rules",
+        "choices": [
+          {
+            "label": "Full game",
+            "id": "full"
+          },
+          {
+            "label": "Introductory rules (no trucks or sports cars)",
+            "id": "intro"
+          }
+        ]
+      },
+      "currentValue": "full"
+    }
+  ],
+  "version": "1.0.1",
+  "coreVersion": "2.1.0",
+  "backgroundColor": "#131313",
+  "foregroundColor": "#FFFFFFE6",
+  "name": "Horseless Carriage",
+  "licenseInformation": "Fan implementation; Horseless Carriage © Splotter Spellen BV 2022.",
+  "implementationNotes": "The full game and the introductory rules (no trucks or sports cars), 3–5 players, audited rule by rule against the publisher's rulebook. Everyone builds at once in phase 3; when the shared supply runs short, engineering focus decides who keeps their pieces and the others rebuild. Where the rulebook is silent: price markers are $6, $4, $3 and $2; minimum specs have no upper limit; car meeples, sparks and spec indicators never run out; each colour set adds 6 research and 6 planning departments to the supply, and the two starting departments come from it; touching mainline sides of the same step form one manufacturing zone; floor expansions are rotated but never turned over; a market window may go anywhere within its dealer's specs, and sells nothing that turn if no buyer inside can be sold to; a player with no card they may play skips growing demand.",
+  "publisher": "Splotter Spellen",
+  "designer": "Jeroen Doumen, Joris Wiersinga",
+  "artist": "Jan Lipiński",
+  "rulesPdfUrl": "",
+  "purchaseUrl": "https://www.splotter.nl",
+  "publisherUrl": "https://www.splotter.nl",
+  "description": "Industrialists build factories and sell the first automobiles to a market whose tastes change every year.",
+  "boxArt": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/482b3a587104800f4f2b.561c93c5.jpg",
+  "screenshot": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/54e1a7efc87278351df8.2c442888.jpg",
+  "demos": [
+    {
+      "id": "demo",
+      "kind": "demo",
+      "title": "Demo"
+    },
+    {
+      "id": "tutorial",
+      "kind": "tutorial",
+      "title": "How to play",
+      "locales": [
+        "en"
+      ],
+      "titles": {
+        "en": "How to play"
+      },
+      "steps": 174,
+      "requires": []
+    }
+  ],
+  "webEntry": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/game.98570ee492fa1613009e.js",
+  "nodeEntry": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/node.c8f01e484539c0ffb81c.js"
+}
