@@ -11,6 +11,7 @@ export function describePlayer(root: Root, p: Player): string {
   const dealers = f.placedTiles().filter((t) => t.kind === "dealership").map((d) => `${d.label()} ${d.publishedSize} ${dimensions.filter((x) => d.publishedSpecs[x]).map((x) => x.slice(0, 3) + d.publishedSpecs[x]).join(",")}`);
   return [
     `${p.name} (${p.playerColor}): $${p.wealth.value}, Gantt ${p.gantt.value}, capacity ${p.capacity.value}, focus ${root.office.focusSlot(p.playerId) ?? "-"} (hist ${root.office.historicalSlot(p.playerId) ?? "-"}), expansions ${f.expansionsPlaced}/${f.expansionsLeft}, hand ${p.hand.cards.length}`,
+    `  floors: ${f.floors.copy().map((fl) => `${fl.kind}@${fl.x},${fl.y}r${fl.rotation}${fl.committed ? "" : "*"}`).join(" ")}`,
     `  tiles: ${tiles.join(" ") || "-"}`,
     `  indicators: ${inds.join(" ") || "-"}; dealers: ${dealers.join("; ") || "-"}`,
     `  research: ${root.allTracks().map((t) => `${t.dimension.slice(0, 3)}${t.positionOf(p.playerId)}`).join(" ")}`,

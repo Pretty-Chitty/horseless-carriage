@@ -272,15 +272,25 @@ export class Factory extends Chit {
     const ok = this.expansionPositions(tile).some((c) => c.x === tile.x && c.y === tile.y);
     return ok ? [] : ["An expansion must touch the factory along the grid, may not cover a keep-clear strip, and its own keep-clear strip must stay free."];
   }
-  // The first legal spot for a new expansion, trying each orientation in turn.
+  // Where a new expansion starts: the legal spot, in any orientation, sharing the most edge with
+  // the factory and then keeping it most compact (developer: the first legal spot in scan order
+  // was a sliver hanging off a corner). The player may drag it anywhere legal from there.
   placeNewExpansion(tile: FloorTile): void {
-    for (const flipped of [false]) // P3.22: the tile's back is blank, so it is never turned over
-      for (let r = 0; r < 4; r++) {
-        tile.rotation = r;
-        tile.flipped = flipped;
-        const at = this.expansionPositions(tile)[0];
-        if (at) { tile.x = at.x; tile.y = at.y; return; }
+    const floor = this.grid().floorAll;
+    const b = this.bounds();
+    let best: { r: number; x: number; y: number; contact: number; area: number } | undefined;
+    for (let r = 0; r < 4; r++) { // P3.22: the tile's back is blank, so it is never turned over
+      tile.rotation = r;
+      tile.flipped = false;
+      const f = tile.footprint();
+      for (const at of this.expansionPositions(tile)) {
+        const cells = cellsOf(at.x, at.y, f);
+        const contact = cells.reduce((n, c) => n + NEIGHBOURS.filter((d) => floor.has(cellKey(c.x + d.x, c.y + d.y))).length, 0);
+        const area = (Math.max(b.maxX, at.x + f.w) - Math.min(b.minX, at.x)) * (Math.max(b.maxY, at.y + f.h) - Math.min(b.minY, at.y));
+        if (!best || contact > best.contact || (contact === best.contact && area < best.area)) best = { r, x: at.x, y: at.y, contact, area };
       }
+    }
+    if (best) { tile.rotation = best.r; tile.x = best.x; tile.y = best.y; }
   }
   pendingExpansion(): FloorTile | undefined {
     return this.floors.find((fl) => !fl.committed);

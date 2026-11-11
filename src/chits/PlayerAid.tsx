@@ -239,7 +239,7 @@ function Body({ aid, playerId }: { aid: PlayerAid; playerId: string }) {
                 <tbody>
                   {x.prices.map((p) => (
                     <tr key={p.seg}>
-                      <td>{["", "I (cheapest)", "II", "III", "IV (dearest)"][p.seg]}</td>
+                      <td>{["", "I (cheapest)", "II", "III", "IV (most expensive)"][p.seg]}</td>
                       <td>{p.price ? `$${p.price}` : "—"}</td>
                       {carTypes.map((t) => <td key={t}>{p.buyers[t] || ""}</td>)}
                     </tr>

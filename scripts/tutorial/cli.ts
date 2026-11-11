@@ -15,7 +15,7 @@ import { runTutorial } from "@pretty-chitty/core";
 import { isAllowed, shapeOfAiOption } from "../../node_modules/@pretty-chitty/core/dist/game/tutorial/allowed.js";
 // ADAPT: the game
 import Game from "../../src/HorselessCarriage";
-import { objectives } from "./objectives";
+import { objectives, rejectReason } from "./objectives";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -202,6 +202,7 @@ async function main() {
       const k = r.outcome === "completed" ? (Number.isFinite(score) ? "scored" : "rejected") : r.outcome;
       tally[k] = (tally[k] ?? 0) + 1;
       if (k === "rejected" && r.warnings.length && tally[k] <= 2) out(`  seed ${seed}: rejected for warnings: ${r.warnings.join(" | ")}`);
+      else if (k === "rejected" && tally[k] <= 3) out(`  seed ${seed}: rejected${rejectReason ? `: ${rejectReason}` : ""}`);
       if (r.outcome !== "completed" && tally[k] <= 2) out(`  seed ${seed}: ${r.outcome} ${r.stuckOn ?? ""} ${r.blocked.join(" ")} ${r.error ?? ""} ${r.warnings.join(" | ")}`);
       if (Number.isFinite(score) && (!best || score > best.score)) {
         best = { score, seed, r };

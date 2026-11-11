@@ -22,6 +22,28 @@ function sparkWords(sparks: { type: CarType; count: number }[]): string {
 export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
   const market = root.market;
   const players = root.players.copy();
+  const quadrantName = (q: Quadrant) => ["I", "II", "III", "IV"][q - 1];
+  const topLayer = (q: Quadrant) => Math.max(0, ...market.played.filter((c) => c.quadrant === q).map((c) => c.layer));
+  const putDown = (card: Card, q: Quadrant) => {
+    card.quadrant = q;
+    card.revealed = false;
+    card.stack = market.played.filter((c) => c.quadrant === q).length;
+    card.layer = topLayer(q) + 1;
+    market.played.add(card);
+  };
+
+  // P8.8's neutral cards are dealt face down to their quadrants before anyone plays (developer):
+  // nobody sees them until they turn, so drawing them first changes nothing but the table, where
+  // they lie beside the players' cards and turn with them.
+  const neutral: Card[] = [];
+  for (const q of [2, 3, ...Array<Quadrant>(Math.max(0, players.length - 2)).fill(1)] as Quadrant[]) {
+    const card = await market.neutralDeck.draw();
+    if (!card) break;
+    putDown(card, q);
+    neutral.push(card);
+  }
+  if (neutral.length) turn.log(`The neutral deck deals ${neutral.length} card${neutral.length === 1 ? "" : "s"} face down`);
+  turn.flush();
 
   // P8.1–P8.4: in engineering order each player plays one card face down next to a quadrant.
   for (const player of root.engineeringOrder()) {
@@ -42,11 +64,7 @@ export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
       ]);
       for (const q of market.quadrantTargets.copy()) q.active = true;
       await decide(t, player, [
-        Chit.pick(market.quadrantTargets, (q) => {
-          card!.quadrant = q.quadrant;
-          card!.revealed = false;
-          market.played.add(card!);
-        })
+        Chit.pick(market.quadrantTargets, (q) => putDown(card!, q.quadrant))
           .message("choose a quadrant for the card")
           .help("The card's 4×4 grid maps straight onto the quadrant: its top-left cell is the quadrant's top-left niche.")
           .context(card)
@@ -54,19 +72,25 @@ export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
           .ai("grow.quadrant"),
       ]);
       for (const q of market.quadrantTargets.copy()) q.active = false;
-      t.log(`${player.logKey} plays a card face down on quadrant ${["I", "II", "III", "IV"][card!.quadrant - 1]}`);
+      t.log(`${player.logKey} plays a card face down on quadrant ${quadrantName(card!.quadrant as Quadrant)}`);
       t.flush();
     });
   }
 
-  // P8.5, P8.6: quadrant by quadrant, reveal, place sparks, punch the clock, discard.
+  // What flew out of a card: once it has landed it is pointed back at its niche, since the card
+  // is discarded (a reload must not name a chit that is gone).
+  const flown: { chit: Spark | Car; home: Chit }[] = [];
+  // P8.5, P8.6: quadrant by quadrant, each card turns over and its sparks fly out of it onto
+  // their niches, and its punch clocks move the timecard. The neutral cards turn last: they
+  // bring buyers, not sparks, and those come after the sparks' (P8.8).
   for (const q of [1, 2, 3, 4] as Quadrant[]) {
-    const cards = market.played.filter((c) => c.quadrant === q);
-    if (cards.length === 0) continue;
+    const here = market.played.filter((c) => c.quadrant === q);
     const origin = QUADRANTS.find((s) => s.quadrant === q)!;
-    for (const card of cards) {
+    for (const card of [...here.filter((c) => c.ownerId), ...here.filter((c) => !c.ownerId)]) {
       card.revealed = true;
+      card.layer = topLayer(q) + 1; // it turns over on top of the pile
       turn.flush();
+      if (!card.ownerId) continue;
       const s = card.spec();
       for (const sp of s.sparks) {
         const niche = market.niche(origin.row0 + sp.row - 1, origin.col0 + sp.col - 1);
@@ -76,19 +100,20 @@ export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
         if (single && left > 0) { single.count = 2; left -= 1; }
         while (left > 0) {
           const n = Math.min(2, left) as 1 | 2;
-          niche.sparks.add(new Spark().set((x) => { x.carType = sp.type; x.count = n; x.parentFallback = niche; }));
+          const spark = new Spark().set((x) => { x.carType = sp.type; x.count = n; x.parentFallback = card; }); // out of the card
+          niche.sparks.add(spark);
+          flown.push({ chit: spark, home: niche });
           left -= n;
         }
       }
       if (s.clocks) root.clock.punch(s.clocks);
       const owner = players.find((p) => p.playerId === card.ownerId);
-      turn.log(`${owner?.logKey ?? "A player"}'s card adds ${s.sparks.length ? sparkWords(s.sparks) : "no sparks"} to quadrant ${["I", "II", "III", "IV"][q - 1]}${s.clocks ? ` and moves the timecard down ${s.clocks}` : ""}`);
+      turn.log(`${owner?.logKey ?? "A player"}'s card adds ${s.sparks.length ? sparkWords(s.sparks) : "no sparks"} to quadrant ${quadrantName(q)}${s.clocks ? ` and moves the timecard down ${s.clocks}` : ""}`);
       turn.flush();
-      card.removeFromParent(); // P8.4: never returns
     }
   }
 
-  // P8.7: every spark generates a buyer, up to the cap per spark.
+  // P8.7: every spark generates a buyer, up to the cap per spark; each rises out of its spark.
   let generated = 0;
   const born: Partial<Record<CarType, number>> = {};
   for (const niche of market.niches.copy()) {
@@ -96,7 +121,12 @@ export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
       const sparks = niche.sparksOf(type);
       if (!sparks) continue;
       const add = Math.max(0, Math.min(sparks, SPARK_BUYER_CAP * sparks - niche.buyersOf(type).length));
-      for (let i = 0; i < add; i++) niche.buyers.add(new Car().set((c) => { c.carType = type; c.parentFallback = niche; })); // rises out of its niche
+      const from = niche.sparks.find((x) => x.carType === type) ?? niche;
+      for (let i = 0; i < add; i++) {
+        const car = new Car().set((c) => { c.carType = type; c.parentFallback = from; });
+        niche.buyers.add(car);
+        flown.push({ chit: car, home: niche });
+      }
       generated += add;
       born[type] = (born[type] ?? 0) + add;
     }
@@ -104,9 +134,31 @@ export async function executeGrowDemand(root: Root, turn: T): Promise<void> {
   if (generated) turn.log(`Sparks bring ${carCounts(born)} new buyer${generated === 1 ? "" : "s"} to the market`);
   turn.flush();
 
-  // P8.8, P8.9: spontaneous buyers from the neutral deck.
-  await drawNeutralBuyers(root, turn, [2, 3, ...Array<Quadrant>(Math.max(0, players.length - 2)).fill(1)]);
-  // P8.10
+  // P8.8: the neutral cards' buyers, each driving off its card (they ignore the spark cap).
+  const placed: { quadrant: number; type: CarType; n: number }[] = [];
+  for (const card of neutral) {
+    const q = card.quadrant as Quadrant;
+    const origin = QUADRANTS.find((s) => s.quadrant === q)!;
+    for (const sp of card.spec().sparks) {
+      const niche = market.niche(origin.row0 + sp.row - 1, origin.col0 + sp.col - 1);
+      for (let i = 0; i < sp.count; i++) {
+        const car = new Car().set((c) => { c.carType = sp.type as CarType; c.parentFallback = card; });
+        niche.buyers.add(car);
+        flown.push({ chit: car, home: niche });
+      }
+      placed.push({ quadrant: q, type: sp.type as CarType, n: sp.count });
+    }
+  }
+  if (placed.length) turn.log(`Neutral cards place ${byQuadrant(placed)}`);
+  turn.flush();
+
+  // P8.4: the players' cards are discarded for good; P8.9: the neutral cards go back and the
+  // deck is shuffled. P8.10: prices.
+  for (const f of flown) f.chit.parentFallback = f.home;
+  for (const card of market.played.filter((c) => !!c.ownerId)) card.removeFromParent();
+  for (const card of neutral) { card.revealed = false; card.quadrant = 0; card.stack = 0; card.layer = 0; }
+  market.neutralDeck.discard(neutral);
+  market.neutralDeck.shuffle();
   market.repriceSegments();
   turn.flush();
 }

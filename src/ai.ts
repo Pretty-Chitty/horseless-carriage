@@ -45,7 +45,7 @@ function nextObsolete(view: Root): Dimension | undefined {
 function bestSpec(me: Player, d: Dimension): number {
   return Math.max(0, ...myDealers(me).map((t) => t.publishedSpecs[d] ?? 0));
 }
-// What a buyer of each segment usually pays: the printed markers, dearest segment first (M3).
+// What a buyer of each segment usually pays: the printed markers, most expensive segment first (M3).
 const SEGMENT_PRICE: Record<Segment, number> = { 1: 2.5, 2: 3, 3: 4, 4: 5.5 };
 
 // How much a dimension matters to me right now, for research.
@@ -368,6 +368,8 @@ export const ai = defineAi<Player, Root, Memory>({
     "build.expansion": buildRule,
     "build.rotateFloor": () => -Infinity,
     "build.flipFloor": () => -Infinity,
+    // The bots add by tapping (build.add); a drag out of the strip offers the same placements.
+    "build.addDrag": () => -Infinity,
 
     // P5: take the most money now, and prefer windows that cover more buyers for later rounds.
     "sell.niche": (opt, { view, me }) => {

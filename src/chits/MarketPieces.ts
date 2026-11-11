@@ -209,9 +209,10 @@ export class ObsolescenceMarker extends Chit {
     spec.object = new Mesh(discGeometry(1.1, 0.12), [new ArrowFace().material, new MeshPhongMaterial({ color: "#161616" })]);
     spec.object.castShadow = true;
     // In the corner where the two active tracks meet (developer), pointing along the one that
-    // leaves the market at the end of this year; it turns a quarter each year (P7.6).
-    spec.offsetX = LEFT_TRACK_X;
-    spec.offsetY = BOTTOM_TRACK_Y;
+    // leaves the market at the end of this year; it turns a quarter each year (P7.6). Set a
+    // little out along the diagonal, clear of quadrant I's played cards at the board's corner.
+    spec.offsetX = LEFT_TRACK_X - 0.3;
+    spec.offsetY = BOTTOM_TRACK_Y - 0.3;
     spec.rotateZ = this.side === "bottom" ? -Math.PI / 2 : 0; // the arrow is printed pointing up
     spec.offsetZ = -BOARD_THICKNESS / 2; // on the table
     spec.highlight.color = outlineFor("#161616");

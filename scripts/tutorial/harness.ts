@@ -236,8 +236,11 @@ async function run(opts: RunOptions, progress: { step?: string }): Promise<RunRe
         ...base, // choose (forced moves), hold (wait for the step that scripts the next move)
         // While recording, a step that names its actors (`stepActors`) holds every other bot, so each
         // bot's moves land in its own step; replays hold them the same way, by the step of their next
-        // scripted move.
-        hold: recording ? (prompt) => gatedOut(p.id, prompt) : base.hold,
+        // scripted move. A bot whose next move is already pinned to a later step waits for it while
+        // recording too (as it does in the browser): played free, the pin stays queued and every later
+        // prompt warns about it, which rejects the run (Horseless Carriage, a search from year 2 with
+        // year 1 kept). Only a bot with no pin left plays free.
+        hold: recording ? (prompt) => gatedOut(p.id, prompt) || !!base.hold?.(prompt) : base.hold,
         // The engine's own Confirm is answered at once (index 0, so the bot's random stream is never
         // touched) and not scripted: the engine lets a bot's Confirm through whatever step is on screen.
         choose: (scored, ctx) => {
@@ -262,7 +265,6 @@ async function run(opts: RunOptions, progress: { step?: string }): Promise<RunRe
             });
             return best < 0 ? undefined : best; // every option vetoed: the bot's own choice (an objective can reject the run)
           };
-          if (recording && runtime.waitingForStep(p.id)) return onlyConfirms ? 0 : steered(); // free until its scripted step
           const forced = base.choose?.(scored, ctx);
           return forced === undefined ? (onlyConfirms ? 0 : steered()) : forced;
         },

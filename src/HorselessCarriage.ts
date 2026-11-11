@@ -128,7 +128,7 @@ export default class HorselessCarriage implements Game<Player, Root> {
       p.factory.catalogue = cat;
       p.setupHand(root.variant === "intro"); // S2, V1
     });
-    root.supply.setup(players.length); // S16
+    root.supply.setup(players.length, root.variant === "intro"); // S16, V2a
     root.market.setup(); // C4, C5
     root.market.setupReach(players); // the reach overlays, one per possible dealership
     root.market.setupWindowTargets();

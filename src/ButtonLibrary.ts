@@ -46,6 +46,9 @@ export class AddItemButton extends ToggleGalleryButton {
   override icon = AddBoxIcon;
   override autoShow = false;
   override toggleSmallSize = 130;
+  // It reopens after every add: hold the strip while the new piece animates in, so the next
+  // prompt's gallery swaps in place (engine opt-in; ignored by engines before it existed).
+  holdOnCloseMs = 4000;
 }
 // The picker for which spec indicator to add; opens straight away.
 export class SpecPickerButton extends ToggleGalleryButton {

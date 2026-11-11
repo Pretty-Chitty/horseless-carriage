@@ -494,6 +494,9 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
   neutral truck card is removed, 6 neutral cards remain).
 - **V2** Every mainline produces normal cars, "even the bigger mainlines depicting trucks or
   sports cars".
+- **V2a** (developer, 2026-11-07) The truck and sports-car mainlines stay in the box too: the
+  supply, and so the Add catalogue, offers only car mainlines. This overrides the rulebook's
+  "even the bigger mainlines" in V2, which is now moot.
 - **V3** Truck and sports-car meeples and sparks are not used.
 
 ---

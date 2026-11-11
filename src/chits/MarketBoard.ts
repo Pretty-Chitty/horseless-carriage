@@ -115,7 +115,7 @@ export class MarketBoard extends Chit {
   segmentPrice(seg: Segment): number | undefined {
     return this.prices[seg] || undefined;
   }
-  // P8.10 (and S15): walk the segments from the dearest down; each non-empty one takes the
+  // P8.10 (and S15): walk the segments from the most expensive down; each non-empty one takes the
   // next highest marker; empty segments get none.
   repriceSegments(): void {
     const values = [...PRICE_MARKERS];

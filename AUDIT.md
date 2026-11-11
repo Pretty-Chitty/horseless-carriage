@@ -251,7 +251,8 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | Rule | Status | Location | Note |
 |---|---|---|---|
 | V1 | ✅ | `Player.ts:43`, `HorselessCarriage.ts:122`, `consts.ts:485-486` | |
-| V2 | ✅ | `phase5Sell.ts:37-39` | |
+| V2 | ✅ | `phase5Sell.ts:37-39` | Moot under V2a: only car mainlines exist in intro. |
+| V2a | ✅ | `SupplyArea.ts` setup, `HorselessCarriage.ts` gameSetup | Developer decision; overrides V2. |
 | V3 | ✅ | follows from V1 | No sport or truck spark or buyer can appear. |
 
 ### UX — developer decisions

@@ -1,8 +1,11 @@
 import { BoxGeometry, Mesh, MeshPhongMaterial, PlaneGeometry } from "three";
 import { CardMesh, Chit, ChitRenderSpec, GameDeckChit, HiddenPropertySerializationRule, Ordered, OrderedOutlet } from "@pretty-chitty/core";
-import { playerHex, outlineFor, TABLE_Z, FLOOR_THICKNESS, BOARD_THICKNESS, CARD_H, CARD_W, CardSpec, NEUTRAL_DECK, MARKET_EDGE, PLAYER_DECK, PlayerColor, Quadrant, TRACK_HEIGHT, AXIS_HEIGHT, flipLift } from "../consts";
+import { playerHex, outlineFor, TABLE_Z, FLOOR_THICKNESS, BOARD_THICKNESS, CARD_H, CARD_W, CardSpec, NEUTRAL_DECK, MARKET_EDGE, PLAYER_DECK, PlayerColor, Quadrant, AXIS_HEIGHT, TRACK_HEIGHT, flipLift } from "../consts";
 import { CardBack, CardFace } from "../canvas/CardFace";
-import { LEFT_TRACK_X, MarketBoard } from "./MarketBoard";
+import { MarketBoard } from "./MarketBoard";
+
+// The gap between the board's corner and a played card's (both ways).
+const CARD_GAP = 0.1;
 
 export function cardSpecOf(id: string): CardSpec {
   const c = [...PLAYER_DECK, ...NEUTRAL_DECK].find((x) => x.id === id);
@@ -17,6 +20,8 @@ export class Card extends Chit {
   playerColor: PlayerColor | "neutral" = "neutral";
   ownerId = "";
   quadrant: Quadrant | 0 = 0; // where it was played
+  stack = 0; // its place in that quadrant's pile, from the bottom (set when it goes down)
+  layer = 0; // its height in the pile: each card put down or turned over lies above the ones before
   revealed = false;
 
   override functionallyIdentical(): boolean {
@@ -47,15 +52,16 @@ export class Card extends Chit {
       // Inside the deck box; the gallery shows the faces.
       spec.offsetZ = -0.4;
     } else if (this.parent instanceof MarketBoard) {
-      // Face down beside the quadrant it was played to (P8.2): outside the board, past the
-      // left track for quadrants I and III, past the right edge for II and IV, the cards of
-      // one quadrant staggered down a little so each shows.
+      // Face down just off the quadrant's outer corner (P8.2), diagonally from the board's corner,
+      // so it reads as that quadrant's card and not as part of the track beside it (developer).
+      // A quadrant's cards pile outward, each a little further from the board, so each shows.
       const q = this.quadrant || 1;
       const left = q === 1 || q === 3;
-      const n = this.parentOutletIndex ?? 0;
-      spec.offsetX = left ? LEFT_TRACK_X - TRACK_HEIGHT / 2 - 0.5 - CARD_W / 2 : MARKET_EDGE + 0.5 + CARD_W / 2;
-      spec.offsetY = (q === 1 || q === 2 ? -MARKET_EDGE + CARD_H / 2 + 3 : MARKET_EDGE - CARD_H / 2) - (n % 3) * 0.45;
-      spec.offsetZ = -BOARD_THICKNESS / 2 + n * 0.012; // lying on the table beside the board
+      const bottom = q === 1 || q === 2;
+      const n = Math.min(this.stack, 5);
+      spec.offsetX = (left ? -1 : 1) * (MARKET_EDGE + CARD_GAP + CARD_W / 2);
+      spec.offsetY = (bottom ? -1 : 1) * (MARKET_EDGE + CARD_GAP + CARD_H / 2 + n * 0.45);
+      spec.offsetZ = -BOARD_THICKNESS / 2 + 0.02 + this.layer * 0.04; // on the table beside the board, each higher than the last
       if (!this.revealed) spec.rotateY = Math.PI;
     }
     // A visible card's face says everything (sparks, year, clocks), so it carries no caption
@@ -102,8 +108,8 @@ export class NeutralDeck extends GameDeckChit<Card> {
     const count = this.stages.reduce((n, s) => n + s.chits.length, 0);
     const face = new CardBack().set((b) => (b.playerColor = "neutral")).material;
     spec.object = new Mesh(new PlaneGeometry(CARD_W, CARD_H), face);
-    // On the table to the right of the bottom track, past the obsolescence marker.
-    spec.offsetX = MARKET_EDGE + 2.0 + CARD_W / 2;
+    // On the table to the right of the bottom track, clear of quadrant II's played cards.
+    spec.offsetX = MARKET_EDGE + 2.5 + CARD_W / 2;
     spec.offsetY = -MARKET_EDGE - AXIS_HEIGHT - TRACK_HEIGHT / 2 - 0.4;
     spec.offsetZ = -BOARD_THICKNESS / 2 + 0.005;
     spec.summary = `The neutral market growth deck: ${count} card${count === 1 ? "" : "s"} that place spontaneous buyers.`;

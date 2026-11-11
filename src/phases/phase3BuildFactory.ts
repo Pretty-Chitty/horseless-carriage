@@ -3,6 +3,7 @@ import { Root } from "../chits/Root";
 import { decide } from "../decide";
 import { Player } from "../chits/Player";
 import { Factory, FloorPiece } from "../chits/Factory";
+import { DropTarget } from "../chits/DropTarget";
 import { FactoryTile } from "../chits/FactoryTile";
 import { SpecIndicator } from "../chits/SpecIndicator";
 import { FloorTile } from "../chits/FloorTile";
@@ -122,7 +123,7 @@ export function placeStartingDepartments(player: Player): void {
 }
 
 // A fresh piece of the entry's kind, placed on the floor.
-function mintFrom(entry: FactoryTile, f: Factory): FactoryTile {
+function mintFrom(entry: FactoryTile, f: Factory, from?: Chit): FactoryTile {
   const t = new FactoryTile().set((x) => {
     x.kind = entry.kind;
     x.stationId = entry.stationId;
@@ -131,7 +132,8 @@ function mintFrom(entry: FactoryTile, f: Factory): FactoryTile {
     x.dealerIndex = entry.dealerIndex;
     x.playerColor = entry.playerColor;
     x.playerOwnerId = entry.playerOwnerId;
-    x.parentFallback = f.floors.get(0); // it rises out of the floor, not in from the table edge
+    // It rises out of the floor (or the spot it was dragged to), not in from the table edge.
+    x.parentFallback = from ?? f.floors.get(0);
   });
   f.pieces.add(t);
   const at = f.spotFor(t);
@@ -201,7 +203,17 @@ async function buildTurn(player: Player, root: Root, turn: T, mode: Mode): Promi
     selected = p;
     if (selected) selected.selected = true;
   };
-  const drop = (piece: FloorPiece, target: { x: number; y: number }) => {
+  let draggedIn = false; // an entry dragged straight out of the Add strip this prompt
+  const drop = (piece: FloorPiece, target: DropTarget) => {
+    // A catalogue entry dragged out of the Add strip: a new piece lands where it was dropped.
+    if (piece instanceof FactoryTile && f.benchTiles().includes(piece)) {
+      const t = mintFrom(piece, f, target);
+      t.x = target.x;
+      t.y = target.y;
+      select(t);
+      draggedIn = true;
+      return;
+    }
     // A station's indicators travel with it (UX4).
     if (piece instanceof FactoryTile && piece.placed) {
       for (const ind of f.indicators.filter((i) => i.station === piece)) {
@@ -275,8 +287,17 @@ async function buildTurn(player: Player, root: Root, turn: T, mode: Mode): Promi
           // The gallery reopens after an add, so several items can be added in a row; any
           // other action leaves it closed.
           .toggleButton(new AddItemButton().set((b) => (b.autoShow = justAdded)))
+          // Stage the next build prompt in while the new piece is still animating, so the
+          // gallery swaps in place instead of collapsing and growing back (developer request).
+          .stageInEarly(1)
           .ai("build.add"),
       );
+    // Or drag an entry out of the Add strip straight onto the floor (developer request; the
+    // engine offers this from the inline gallery only).
+    for (const entry of tops) {
+      const targets = targetsFor(entry);
+      if (targets.length) picks.push(Chit.dragPick(entry, targets).stageInEarly(1).ai("build.addDrag"));
+    }
     // Rearrange anything unlocked.
     for (const piece of movable) {
       const targets = targetsFor(piece);
@@ -353,7 +374,8 @@ async function buildTurn(player: Player, root: Root, turn: T, mode: Mode): Promi
       return;
     }
     await decide(turn, player, mode === "setup" ? "place their starting departments" : "build their factory", help, picks);
-    justAdded = addedNow;
+    justAdded = addedNow || draggedIn;
+    draggedIn = false;
     turn.flush();
     turn.zip();
   }

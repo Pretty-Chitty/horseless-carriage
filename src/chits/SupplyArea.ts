@@ -58,7 +58,7 @@ export class SupplyArea extends Chit {
     return { icon: stationArt.steeringWheel, color: "#6d6d6d" };
   }
 
-  setup(sets: number): void {
+  setup(sets: number, intro: boolean): void {
     // The stock laid out as the rulebook groups it: one row per manufacturing step (A, B,
     // C+D), then the mainlines and departments. Piles in a row stand on one baseline with one
     // gap between them, each row centred, with room under the piles for the count tags.
@@ -70,7 +70,8 @@ export class SupplyArea extends Chit {
       station("B"),
       [...station("C"), ...station("D")],
       [
-        ...MAINLINES.map((m) => ({ key: `mainline:${m.type}`, label: `${carTypeLabel(m.type)} mainline`, hex: carTypeHex(m.type), textHex: "#fff", w: m.footprint.w, h: m.footprint.h, count: m.copiesPerSet * sets })),
+        // V2a: the introductory game leaves the truck and sports-car mainlines in the box.
+        ...MAINLINES.filter((m) => !intro || m.type === "car").map((m) => ({ key: `mainline:${m.type}`, label: `${carTypeLabel(m.type)} mainline`, hex: carTypeHex(m.type), textHex: "#fff", w: m.footprint.w, h: m.footprint.h, count: m.copiesPerSet * sets })),
         ...DEPARTMENTS.filter((d) => d.type !== "marketing").map((d) => ({ key: `dept:${d.type}`, label: d.label, hex: d.type === "research" ? "#6e8291" : "#c9dde2", textHex: d.type === "research" ? "#fff" : "#222", w: d.footprint.w, h: d.footprint.h, count: (d.type === "research" ? RESEARCH_DEPARTMENTS_PER_SET : PLANNING_DEPARTMENTS_PER_SET) * sets })),
       ],
     ];
