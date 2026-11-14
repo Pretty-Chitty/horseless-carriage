@@ -23,6 +23,17 @@ export class Root extends RootChit<Player> {
   })
   public variant: "full" | "intro" = "full"; // V1–V3
 
+  // P3.1: the book advises building concurrently, with the supply settled in engineering order.
+  // "engineering" plays it strictly: one player at a time, slot 1 first, each seeing the last.
+  @Selectable({
+    label: "Factory building",
+    choices: [
+      { label: "Everyone at once", id: "simultaneous" },
+      { label: "One at a time, in engineering order", id: "engineering" },
+    ],
+  })
+  public buildOrder: "simultaneous" | "engineering" = "simultaneous";
+
   year = 0; // 0 during setup, then 1..7 (C1, P6.3)
 
   @ChildOutlet public market = new MarketBoard();

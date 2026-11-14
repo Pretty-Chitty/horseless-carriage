@@ -20,24 +20,41 @@
         ]
       },
       "currentValue": "full"
+    },
+    {
+      "fieldName": "buildOrder",
+      "config": {
+        "label": "Factory building",
+        "choices": [
+          {
+            "label": "Everyone at once",
+            "id": "simultaneous"
+          },
+          {
+            "label": "One at a time, in engineering order",
+            "id": "engineering"
+          }
+        ]
+      },
+      "currentValue": "simultaneous"
     }
   ],
-  "version": "1.0.1",
-  "coreVersion": "2.1.0",
+  "version": "1.0.3",
+  "coreVersion": "2.3.1",
   "backgroundColor": "#131313",
   "foregroundColor": "#FFFFFFE6",
   "name": "Horseless Carriage",
   "licenseInformation": "Fan implementation; Horseless Carriage © Splotter Spellen BV 2022.",
-  "implementationNotes": "The full game and the introductory rules (no trucks or sports cars), 3–5 players, audited rule by rule against the publisher's rulebook. Everyone builds at once in phase 3; when the shared supply runs short, engineering focus decides who keeps their pieces and the others rebuild. Where the rulebook is silent: price markers are $6, $4, $3 and $2; minimum specs have no upper limit; car meeples, sparks and spec indicators never run out; each colour set adds 6 research and 6 planning departments to the supply, and the two starting departments come from it; touching mainline sides of the same step form one manufacturing zone; floor expansions are rotated but never turned over; a market window may go anywhere within its dealer's specs, and sells nothing that turn if no buyer inside can be sold to; a player with no card they may play skips growing demand.",
+  "implementationNotes": "All rules implemented, including the introductory rules. By default everyone builds their factory at the same time: if two players want the last of a piece, the player earlier in engineering order gets it, and the other builds something else. The Factory building option makes players build one at a time in engineering order instead.",
   "publisher": "Splotter Spellen",
   "designer": "Jeroen Doumen, Joris Wiersinga",
   "artist": "Jan Lipiński",
-  "rulesPdfUrl": "",
-  "purchaseUrl": "https://www.splotter.nl",
+  "rulesPdfUrl": "https://splottercon.com/rules-horseless-carriage/",
+  "purchaseUrl": "https://www.splottershop.com/products/horseless-carriage",
   "publisherUrl": "https://www.splotter.nl",
   "description": "Industrialists build factories and sell the first automobiles to a market whose tastes change every year.",
-  "boxArt": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/482b3a587104800f4f2b.561c93c5.jpg",
-  "screenshot": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/54e1a7efc87278351df8.2c442888.jpg",
+  "boxArt": "https://pretty-chitty.b-cdn.net/horseless-carriage/482b3a587104800f4f2b.561c93c5.jpg",
+  "screenshot": "https://pretty-chitty.b-cdn.net/horseless-carriage/54e1a7efc87278351df8.2c442888.jpg",
   "demos": [
     {
       "id": "demo",
@@ -58,6 +75,6 @@
       "requires": []
     }
   ],
-  "webEntry": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/game.98570ee492fa1613009e.js",
-  "nodeEntry": "https://pretty-chitty-dev.b-cdn.net/horseless-carriage/node.c8f01e484539c0ffb81c.js"
+  "webEntry": "https://pretty-chitty.b-cdn.net/horseless-carriage/game.d327041b13fac6aaa0e5.js",
+  "nodeEntry": "https://pretty-chitty.b-cdn.net/horseless-carriage/node.aeeacac92829b7205be3.js"
 }

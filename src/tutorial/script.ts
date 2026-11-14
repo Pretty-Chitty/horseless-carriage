@@ -436,6 +436,11 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
   // The black cards' buyers (one left after the sales, three from sparks, three from the neutral cards)
   const neutralBuyers = checks.state<Player, Root>((root) => root.year === 1 && allTurned(root) && buyersOnBoard(root) >= 7);
   const sparkBuyers = logged(/Sparks bring/);
+  // The bots' year-1 research and focus, on state like year 2's (a log check held the board a moment early in one
+  // timing and not the other once the narration's pauses lengthened the clips). Active tracks start on slot 1.
+  const robinResearched1 = checks.state<Player, Root>((root) => root.year === 1 && root.track("safety").positionOf(robin(root).playerId) === 2);
+  const samResearched1 = checks.state<Player, Root>((root) => root.year === 1 && root.track("design").positionOf(sam(root).playerId) === 1);
+  const robinFocus1 = checks.state<Player, Root>((root) => root.year === 1 && root.office.focusSlot(robin(root).playerId) === 3);
   // Sales are held on wealth (state), not on the log line: see samDesign2 below
   const robinSold = checks.state<Player, Root>((root) => root.year === 1 && robin(root).wealth.value >= 6);
   const samSold = checks.state<Player, Root>((root) => root.year === 1 && sam(root).wealth.value >= 6);
@@ -487,18 +492,18 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
   const steps: Step[] = [
     // ------------------------------------------------------------------ the table
     narrate("welcome", { box: { anchor: "center" }, focus: [] }),
+    // One thing per sentence: a beat lands at its sentence's start, so "beside our name" and "the clock" in one
+    // sentence had the clock ringed while the narrator pointed at the money (developer, 2026-11-13)
     narrate(
       "goal",
       beats("goal", [
-        ["Money", [{ arrow: spark((me) => me.wealth) }]],
-        ["clock runs out", [{ ring: clockSpaces, zoom: false }, { ring: timecard, arrow: true }]],
-        ["turning a car", [{ arrow: spark((me) => me.wealth) }]],
+        ["", [{ arrow: spark((me) => me.wealth) }]],
+        ["When the clock runs out", [{ ring: clockSpaces, zoom: false }, { ring: timecard, arrow: true }]],
       ]),
     ),
     narrate(
       "chain",
       beats("chain", [
-        ["", []],
         ["Buyers want", [{ ring: nichesWithBuyers, separate: true, arrow: true, reveal: true }]],
         ["stations in our factory", [{ ring: factory, arrow: true, reveal: true, zoom: false }]],
         ["Stations come from research", [{ ring: activeTracks, separate: true, arrow: true, reveal: true }]],
@@ -554,7 +559,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "tracks-slots",
       beats("tracks-slots", [
         ["", [{ ring: (root) => root.track("reliability").slots.filter((s) => s.position > 0), separate: true }]],
-        ["Reach a slot", [{ ring: (root) => root.track("reliability").slot(2), arrow: true }]],
+        ["reaches a slot", [{ ring: (root) => root.track("reliability").slot(2), arrow: true }]],
       ]),
     ),
     narrate(
@@ -576,9 +581,8 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "office",
       beats("office", [
         ["", [{ ring: office, reveal: true, zoom: false }]],
-        ["builds first", [{ ring: officeSpace("focus", 1), arrow: true }, { ring: supply, zoom: false }]],
-        ["sells first", [{ ring: officeSpace("focus", 3), arrow: true }, { ring: nichesWithBuyers, separate: true }]],
-        ["when we set it", [{ ring: officeSpaces("focus") }]],
+        ["first to build", [{ ring: officeSpace("focus", 1), arrow: true }, { ring: supply, zoom: false }]],
+        ["first to sell", [{ ring: officeSpace("focus", 3), arrow: true }, { ring: nichesWithBuyers, separate: true }]],
       ]),
     ),
     narrate(
@@ -602,7 +606,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "supply",
       beats("supply", [
         ["", [{ ring: supply, arrow: true, reveal: true, zoom: false }]],
-        ["last radiator", [{ ring: (root) => root.supply.stacks.find((s) => s.key === "station:radiator"), arrow: true }]],
+        ["radiators are gone", [{ ring: (root) => root.supply.stacks.find((s) => s.key === "station:radiator"), arrow: true }]],
       ]),
     ),
     narrate("cards", { focus: [{ ring: hand, arrow: true, reveal: true }] }),
@@ -627,9 +631,9 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "research-rules",
       beats("research-rules", [
         ["", [{ ring: myMarkers, separate: true, arrow: true, reveal: true }]],
-        ["Any marker", [{ ring: (root) => root.allTracks().flatMap((t) => t.markers()), separate: true }]],
+        ["any marker on any track", [{ ring: (root) => root.allTracks().flatMap((t) => t.markers()), separate: true }]],
         ["first engineering slot", [{ ring: officeSpace("focus", 1), arrow: true, reveal: true }]],
-        ["More departments", [{ ring: myDepartments("research"), arrow: true, reveal: true }]],
+        ["More research departments", [{ ring: myDepartments("research"), arrow: true, reveal: true }]],
       ]),
     ),
     narrate("research-capacity", { focus: [{ arrow: spark((me) => me.capacity) }, { arrow: { ui: "button:Capacity" } }] }),
@@ -657,13 +661,13 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["build a chassis", [{ ring: (root) => root.track("reliability").slot(2), arrow: true }]],
       ]),
     }),
-    watch("others-research-robin", "p1", logged(/:p1: (advances|raises)/), {
+    watch("others-research-robin", "p1", robinResearched1, {
       ...beats("others-research-robin", [
         ["", [{ ring: (root) => root.track("safety").slot(1), arrow: true, reveal: true }]],
         ["other track", [{ ring: (root) => root.track("safety"), arrow: true }]],
       ]),
     }),
-    watch("others-research-sam", "p2", logged(/:p2: (advances|raises)/), {
+    watch("others-research-sam", "p2", samResearched1, {
       ...beats("others-research-sam", [
         ["", [{ ring: (root) => root.track("design").slot(1), arrow: true, reveal: true }]],
         ["one track leaves", [{ ring: (root) => root.market.obsolescenceMarker, arrow: true, reveal: true }]],
@@ -685,9 +689,9 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "focus-patents",
       beats("focus-patents", [
         ["", [{ ring: officeSpaces("focus"), separate: true, reveal: true, zoom: false }]],
-        ["Slot 1 may build", [{ ring: officeSpace("focus", 1), arrow: true }, { ring: activeTracks, separate: true }]],
-        ["Slot 2 may build", [{ ring: officeSpace("focus", 2), arrow: true }, { ring: activeTracks, separate: true }]],
-        ["Slot 3 builds", [{ ring: officeSpace("focus", 3), arrow: true }]],
+        ["Slot 1 can build", [{ ring: officeSpace("focus", 1), arrow: true }, { ring: activeTracks, separate: true }]],
+        ["Slot 2 can build", [{ ring: officeSpace("focus", 2), arrow: true }, { ring: activeTracks, separate: true }]],
+        ["Slot 3 can build", [{ ring: officeSpace("focus", 3), arrow: true }]],
         ["supply runs short", [{ ring: supply, arrow: true, reveal: true, zoom: false }]],
       ]),
     ),
@@ -697,7 +701,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["", [{ ring: officeSpaces("gantt"), zoom: false }]],
         ["most Gantt charts", [{ ring: officeSpaces("gantt"), zoom: false }, { arrow: spark((me) => me.gantt) }]],
         ["back to zero", [{ ring: officeSpace("gantt", 0), arrow: true }]],
-        ["Passing keeps them", [{ ring: officeSpaces("gantt"), zoom: false }]],
+        ["If you pass", [{ ring: officeSpaces("gantt"), zoom: false }]],
       ]),
     ),
     doIt("focus-do", [{ key: "focus.slot", chit: officeSpace("focus", 1) }], checks.state((root, me) => root.office.focusSlot(me.playerId) === 1), {
@@ -707,7 +711,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       ]),
     }),
     confirm("confirm-focus"),
-    watch("others-focus-robin", "p1", logged(/:p1: (sets their focus|passes)/), { focus: [{ ring: officeSpace("focus", 3), arrow: true }] }),
+    watch("others-focus-robin", "p1", robinFocus1, { focus: [{ ring: officeSpace("focus", 3), arrow: true }] }),
     watch("others-focus-sam", "p2", checks.promptMessage(/build their factory/), {
       ...beats("others-focus-sam", [
         ["", [{ ring: officeSpaces("gantt"), zoom: false }, { arrow: sparkOf(sam, (p) => p.gantt) }]],
@@ -726,8 +730,8 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "build-rules",
       beats("build-rules", [
         ["", [{ ring: mainFloor, zoom: false }]],
-        ["never on the loading bay", [{ ring: mainFloor, zoom: false }, { ring: mainBay, arrow: true }]],
-        ["touches the bay", [{ ring: myTiles("department"), separate: true }, { ring: mainBay, arrow: true }]],
+        ["not on the loading bay", [{ ring: mainFloor, zoom: false }, { ring: mainBay, arrow: true }]],
+        ["must touch the bay", [{ ring: myTiles("department"), separate: true }, { ring: mainBay, arrow: true }]],
       ]),
     ),
     doIt("add-mainline", [{ key: "build.add", chit: entry("mainline:car") }], checks.state((root, me) => !!tile("mainline:car")(root, me)), {
@@ -823,7 +827,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
     doIt("paint-spec", [{ button: "Add spec" }], checks.state((_root, me) => me.factory.indicators.some((i) => i.dimension === "design")), {
       ...beats("paint-spec", [
         ["", [{ ring: tile("station:paint"), arrow: true, dim: true }]],
-        ["Sam's slot", [{ ring: (root) => root.track("design").slot(1), arrow: true, reveal: true }]],
+        ["Sam's research", [{ ring: (root) => root.track("design").slot(1), arrow: true, reveal: true }]],
         ["Tap Add spec", [{ ring: tile("station:paint"), reveal: true }, { arrow: { ui: "button:Add spec" } }]],
       ]),
     }),
@@ -834,7 +838,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "paint-done",
       beats("paint-done", [
         ["", [{ ring: indicatorOf("design"), arrow: true, dim: true }, { ring: tile("mainline:car"), dim: true }]],
-        ["counts for nothing", [{ ring: activeTracks, separate: true, reveal: true }]],
+        ["worth nothing", [{ ring: activeTracks, separate: true, reveal: true }]],
       ]),
     ),
     narrate(
@@ -874,7 +878,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       ...upTo(checks.state((root) => root.playerAid.phase >= 5)),
       ...beats("others-build-look", [
         ["", [{ ring: (root) => robin(root).factory.floors.copy(), separate: true, reveal: true }]],
-        ["Three new stations", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "station"), separate: true, arrow: true, reveal: true }]],
+        ["three new stations", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "station"), separate: true, arrow: true, reveal: true }]],
       ]),
     }),
     narrate("others-build-robin-specs", {
@@ -895,7 +899,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       ...upTo(checks.state((root) => root.playerAid.phase >= 5)),
       ...beats("others-build-research", [
         ["", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "department" && t.departmentType === "research" && !t.committed), arrow: true, reveal: true }]],
-        ["you still take one", [{ ring: myDepartments("research"), arrow: true, reveal: true }]],
+        ["you still get one", [{ ring: myDepartments("research"), arrow: true, reveal: true }]],
       ]),
     }),
     // ------------------------------------------------------------------ year 1: brochures and sales
@@ -972,13 +976,13 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
     watch("others-sell-sam", "p2", samSold, {
       ...beats("others-sell-sam", [
         ["", [{ ring: windowsOf(sam), separate: true, arrow: true, reveal: true }], upTo(samSold)],
-        ["two left", [{ ring: nichesWithBuyers, separate: true, arrow: true }]],
+        ["That leaves two", [{ ring: nichesWithBuyers, separate: true, arrow: true }]],
       ]),
     }),
     doIt("sell-window", [{ key: "sell.window", target: windowSpot(7, 1, 2, 2) }, { button: "Confirm" }], checks.promptMessage(/inside the new window/), {
       ...beats("sell-window", [
         ["", [{ ring: (root) => root.market.windows.filter((w) => w.staged), arrow: true }, { ring: windowArea(7, 1, 2, 2) }]],
-        ["two buyers left", [{ ring: nichesWithBuyers, separate: true, arrow: true }, { ring: windowArea(7, 1, 2, 2) }]],
+        ["last two buyers", [{ ring: nichesWithBuyers, separate: true, arrow: true }, { ring: windowArea(7, 1, 2, 2) }]],
         ["Then confirm", [{ ring: (root) => root.market.windows.filter((w) => w.staged), arrow: true }, { ring: windowArea(7, 1, 2, 2) }]],
       ]),
     }),
@@ -1084,7 +1088,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       beats("grow-year", [
         ["", [{ ring: onCard("P1", CARD_YEAR), arrow: true, zoom: false }], { gallery: { of: hand, mode: "fullscreen" } }],
         ["only your year one cards", [{ ring: onCard("P3", CARD_YEAR), arrow: true, zoom: false }]],
-        ["Bigger cards", [{ ring: (_root, me) => me.factory.floors.copy(), separate: true, reveal: true, zoom: false }], { gallery: "close" }],
+        ["Bigger factories", [{ ring: (_root, me) => me.factory.floors.copy(), separate: true, reveal: true, zoom: false }], { gallery: "close" }],
       ]),
     ),
     doIt("play-card", [{ key: "grow.card", chit: inHand("P3") }], checks.promptMessage(/choose a quadrant/), {
@@ -1138,7 +1142,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
     doIt("y2-research", [{ key: "research.space", chit: mySlot("reliability") }], checks.state((root, me) => root.track("reliability").positionOf(me.playerId) === 3), {
       ...beats("y2-research", [
         ["", [{ ring: (root) => root.track("reliability"), arrow: true, reveal: true }]],
-        ["one step more", [{ ring: (root) => root.track("reliability").slot(3), arrow: true, dim: true }]],
+        ["one more step", [{ ring: (root) => root.track("reliability").slot(3), arrow: true, dim: true }]],
         ["Look at the market", [{ ring: segment(2), separate: true, dim: true, zoom: false, reveal: true }, { ring: priced, separate: true }]],
         ["Two buyers", [{ ring: (root) => root.market.niche(4, 2), arrow: true, reveal: true }, { ring: (root) => [root.market.bottomAxis, root.market.leftAxis], separate: true }]],
         ["Nobody else", [{ ring: (root) => [...robin(root).factory.placedTiles(), ...sam(root).factory.placedTiles()].filter((t) => t.kind === "dealership"), separate: true, arrow: true, reveal: true, zoom: false }]],
@@ -1156,7 +1160,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       ...beats("y2-others-research-sam", [
         ["", [{ ring: officeSpaces("historical"), separate: true, reveal: true }]],
         ["two research departments", [{ ring: (root) => sam(root).factory.placedTiles().filter((t) => t.kind === "department" && t.departmentType === "research"), separate: true, arrow: true, reveal: true, zoom: false }]],
-        ["Design again", [{ ring: (root) => root.track("design").markerOf(sam(root).playerId)!, arrow: true, reveal: true }], upTo(samDesign2)],
+        ["design again", [{ ring: (root) => root.track("design").markerOf(sam(root).playerId)!, arrow: true, reveal: true }], upTo(samDesign2)],
         ["assembly capacity", [{ arrow: sparkOf(sam, (p) => p.capacity) }], upTo(samResearched2)],
       ]),
     }),
@@ -1165,7 +1169,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "department" && t.departmentType === "research"), separate: true, arrow: true, reveal: true, zoom: false }]],
         ["off the board", [{ ring: (root) => root.track("range").markerOf(robin(root).playerId)!, arrow: true, reveal: true }], upTo(robinRange1)],
         ["capacity to two", [{ arrow: sparkOf(robin, (p) => p.capacity) }], upTo(robinResearched2)],
-        ["nobody may move", [{ ring: markersOf(robin), separate: true }]],
+        ["nobody can move", [{ ring: markersOf(robin), separate: true }]],
       ]),
     }),
     // ------------------------------------------------------------------ year 2: focus
@@ -1175,14 +1179,14 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["", [{ ring: officeSpaces("gantt"), reveal: true, zoom: false }]],
         ["Sam kept", [{ ring: officeSpaces("gantt"), zoom: false }, { arrow: sparkOf(sam, (p) => p.gantt) }]],
         ["one each", [{ arrow: spark((me) => me.gantt) }, { arrow: sparkOf(robin, (p) => p.gantt) }]],
-        ["Sam chooses first", [{ ring: officeSpaces("focus"), separate: true }, { arrow: sparkOf(sam, (p) => p.gantt) }]],
+        ["Sam picks first", [{ ring: officeSpaces("focus"), separate: true }, { arrow: sparkOf(sam, (p) => p.gantt) }]],
       ]),
     ),
     watch("y2-others-focus-sam", "p2", samFocus2, {
       ...beats("y2-others-focus-sam", [
         ["", [{ ring: officeSpace("focus", 1), arrow: true, reveal: true }]],
         ["your chassis", [{ ring: myTiles("station"), arrow: true, reveal: true }, { ring: (root) => robin(root).factory.placedTiles().filter((t) => t.stationId === "windowPane"), arrow: true, reveal: true }]],
-        ["copy everybody", [{ ring: officeSpace("focus", 1), arrow: true, reveal: true }]],
+        ["copy everyone", [{ ring: officeSpace("focus", 1), arrow: true, reveal: true }]],
       ]),
     }),
     doIt("y2-focus-do", [{ key: "focus.slot", chit: officeSpace("focus", 3) }], checks.state((root, me) => root.office.focusSlot(me.playerId) === 3), {
@@ -1200,7 +1204,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       beats("y2-build", [
         ["", [{ ring: factory, reveal: true, zoom: false }]],
         ["expansion you placed", [{ ring: (_root, me) => me.factory.floors.get(1)!, arrow: true }]],
-        ["fixed where it stands", [{ ring: myTiles("station"), separate: true }, { ring: myTiles("mainline") }, { ring: myTiles("dealership") }]],
+        ["fixed in place", [{ ring: myTiles("station"), separate: true }, { ring: myTiles("mainline") }, { ring: myTiles("dealership") }]],
         ["Two stations", [{ ring: (root) => [root.track("safety").slot(1), root.track("reliability").slot(3)], separate: true, arrow: true, reveal: true }]],
       ]),
     ),
@@ -1229,7 +1233,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
     doIt("y2-add-carbody", [{ key: "build.add", chit: entry("station:carBody") }], checks.state((root, me) => !!tile("station:carBody")(root, me)), {
       ...beats("y2-add-carbody", [
         ["", [{ ring: (root) => root.track("reliability").slot(3), arrow: true, reveal: true }]],
-        ["need not touch", [{ ring: tile("station:chassis"), arrow: true, reveal: true, dim: true }, { ring: mainlineSide("A"), dim: true }]],
+        ["doesn't need to touch", [{ ring: tile("station:chassis"), arrow: true, reveal: true, dim: true }, { ring: mainlineSide("A"), dim: true }]],
         ["Add the car body", [{ arrow: { ui: "button:Add" } }, { ring: entry("station:carBody"), arrow: true }]],
       ]),
     }),
@@ -1275,7 +1279,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "y2-shared-dealer",
       beats("y2-shared-dealer", [
         ["", [{ ring: myDealer, arrow: true, reveal: true }, { ring: (_root, me) => me.factory.placedTiles().filter((t) => t.kind === "mainline"), separate: true }]],
-        ["the lower of its mainlines", [{ ring: secondMainline, arrow: true }, { ring: firstMainline }]],
+        ["the lower of its two mainlines", [{ ring: secondMainline, arrow: true }, { ring: firstMainline }]],
         ["drags the dealer down", [{ ring: dealerCubes, separate: true, arrow: true }]],
       ]),
     ),
@@ -1325,7 +1329,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       "y2-battery-why",
       beats("y2-battery-why", [
         ["", [{ ring: myPaint, arrow: true, reveal: true, dim: true }, { ring: secondSide("C"), dim: true }, { ring: mainlineSide("C"), dim: true }]],
-        ["stand back", [{ ring: floorSpot(0, 0, 2, 2), arrow: true, dim: true }]],
+        ["further back", [{ ring: floorSpot(0, 0, 2, 2), arrow: true, dim: true }]],
         ["paint's indicator", [{ ring: paintSpec, arrow: true, dim: true }, { ring: floorSpot(0, 0, 2, 2), dim: true }]],
       ]),
     ),
@@ -1366,7 +1370,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
       ...upTo(brochuresOf(2)),
       ...beats("y2-others-build-look", [
         ["", [{ ring: newTilesOf(robin), reveal: true }]],
-        ["A second mainline", [{ ring: (root) => newTilesOf(robin)(root).filter((t) => t.kind === "mainline"), arrow: true, reveal: true }, { ring: (root) => newTilesOf(robin)(root).filter((t) => t.kind === "dealership") }]],
+        ["a second mainline", [{ ring: (root) => newTilesOf(robin)(root).filter((t) => t.kind === "mainline"), arrow: true, reveal: true }, { ring: (root) => newTilesOf(robin)(root).filter((t) => t.kind === "dealership") }]],
         ["Two mainlines", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "mainline"), separate: true, arrow: true, reveal: true }]],
       ]),
     }),
@@ -1388,7 +1392,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["", [{ ring: myDepartments("planning"), arrow: true, reveal: true }, { ring: officeSpaces("gantt"), zoom: false }]],
         ["Your dealer", [{ ring: myTiles("dealership"), arrow: true, reveal: true, dim: true }, { ring: myIndicators, separate: true, dim: true }]],
         ["Robin's first dealer", [{ ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "dealership" && t.dealerIndex === 0), arrow: true, reveal: true }, { ring: (root) => robin(root).factory.placedTiles().filter((t) => t.kind === "mainline"), separate: true }]],
-        ["your reach", [{ ring: reachOf(me_), arrow: true, reveal: true }]],
+        ["you can reach", [{ ring: reachOf(me_), arrow: true, reveal: true }]],
       ]),
     }),
     doIt("y2-sell-window", [{ key: "sell.window", target: windowSpot(4, 1, 2, 2) }, { button: "Confirm" }], grew((_root, me) => me.wealth.value), {
@@ -1424,7 +1428,7 @@ function intro(t: Strings, pins: Pins): TutorialSpec<Player, Root> {
         ["", [{ arrow: { ui: "players" } }, { ring: nichesWithBuyers, separate: true, reveal: true }]],
         ["Robin's dealer sells again", [{ ring: windowsOf(robin), separate: true, arrow: true }, { ring: (root) => root.market.niche(8, 1) }], upTo(sellingOver2)],
         ["Sam's second dealer", [{ ring: (root) => sam(root).factory.placedTiles().filter((t) => t.kind === "dealership" && t.dealerIndex === 1), arrow: true, reveal: true, zoom: false }]],
-        ["two windows of your own", [{ ring: myTiles("dealership"), arrow: true, reveal: true }]],
+        ["two dealers of your own", [{ ring: myTiles("dealership"), arrow: true, reveal: true }]],
       ]),
     }),
     // ------------------------------------------------------------------ year 2: the end of the year

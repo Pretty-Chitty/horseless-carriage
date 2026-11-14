@@ -4,6 +4,7 @@
 //   search --objective name [--from step] [--until step] [--n 100] [--out file]
 //                                                     random runs; the best one's pins go to --out
 //   cues                                              each step's sentences and where its highlights change
+//   migrate --from chronicle.json --out pins.json [--ignore-moment]   re-record onto a new step order
 //   check  [--pins file] [--run-timeout s]                              play the whole script with the shipped pins; fail on
 //                                                     any block, stall, warning or unused pin, and replay it
 //                                                     with browser-like timings to prove it is deterministic
@@ -55,6 +56,11 @@ setTimeout(() => {
   out(`\n${cmd} timed out after ${totalSeconds}s`);
   process.exit(124);
 }, totalSeconds * 1000).unref();
+
+// A draw or bot move that lands a step later than recorded (a Confirm that came later, ending the turn later) is
+// only a note: the pinned draws are handed out in order, so the game is the same. The search ignores it too, or one
+// early step whose timing differs between recording and replay rejects every run.
+const drift = (w: string) => /was declared by step .* but (consumed|used) during/.test(w);
 
 async function main() {
   if (cmd === "trace") {
@@ -161,7 +167,10 @@ async function main() {
     }
     const unused = ordered.length - r.draws.filter((d) => d.step !== "setup").length;
     out(`draws: ${r.draws.length} (${r.draws.filter((d) => d.source === "random").length} unpinned, ${unused} unused)`);
-    const same = r.table === old.table;
+    // --ignore-moment: compare without the first line (round, phase, order track), when the new script ends a
+    // moment earlier or later than the old one but on the same game: every player's state and the board
+    const body = (t: string) => (args.includes("--ignore-moment") ? t.split("\n").slice(1).join("\n") : t);
+    const same = body(r.table) === body(old.table);
     out(same ? "final table identical to the old script's" : `FINAL TABLE DIFFERS\n--- old ---\n${old.table}\n--- new ---\n${r.table}`);
     if (!same) out(`at the end: ${(r.endPrompts ?? []).join("; ")}`);
     if (r.outcome === "completed" && same) {
@@ -198,10 +207,11 @@ async function main() {
       const prng = mulberry(seed * 7919);
       const pins = objective.prepare ? objective.prepare(base, prng) : base;
       const r = await runScript({ pins, until: opt("until"), seed, runTimeoutMs: 60000 });
-      const score = r.warnings.length ? -Infinity : objective.score(r);
+      const warnings = r.warnings.filter((w) => !drift(w));
+      const score = warnings.length ? -Infinity : objective.score(r);
       const k = r.outcome === "completed" ? (Number.isFinite(score) ? "scored" : "rejected") : r.outcome;
       tally[k] = (tally[k] ?? 0) + 1;
-      if (k === "rejected" && r.warnings.length && tally[k] <= 2) out(`  seed ${seed}: rejected for warnings: ${r.warnings.join(" | ")}`);
+      if (k === "rejected" && warnings.length && tally[k] <= 2) out(`  seed ${seed}: rejected for warnings: ${warnings.join(" | ")}`);
       else if (k === "rejected" && tally[k] <= 3) out(`  seed ${seed}: rejected${rejectReason ? `: ${rejectReason}` : ""}`);
       if (r.outcome !== "completed" && tally[k] <= 2) out(`  seed ${seed}: ${r.outcome} ${r.stuckOn ?? ""} ${r.blocked.join(" ")} ${r.error ?? ""} ${r.warnings.join(" | ")}`);
       if (Number.isFinite(score) && (!best || score > best.score)) {
@@ -254,9 +264,6 @@ async function main() {
     let referenceHolds: Map<string, string> | undefined;
     let referenceTable: string | undefined;
     let referenceHeld: { [k: string]: string } | undefined;
-    // A draw or bot move that lands a step later than recorded (a Confirm that came later, ending the
-    // turn later) is only a note: the pinned draws are handed out in order, so the game is the same.
-    const drift = (w: string) => /was declared by step .* but (consumed|used) during/.test(w);
     for (const { label, opts } of runs) {
       const r = await runScript({ pins, seed: 99, stepTimeoutMs: 20000, runTimeoutMs: runSeconds * 1000, recording: false, ...opts });
       // A random draw before the script's last pinned one is a hole in the pins. After it, the bots are playing on past

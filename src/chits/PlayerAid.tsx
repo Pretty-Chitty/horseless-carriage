@@ -26,7 +26,7 @@ import type { Player } from "./Player";
 
 // The player aid (references/player-aid.md): the box's reference sheet made live. Every number
 // is read through the rules' own functions (dealerBrochure, accessibleSlots, segmentPrice,
-// engineeringOrder). Phase 3 is simultaneous, so the aid cannot be refreshed from a prompt: the
+// engineeringOrder). Phase 3 is usually simultaneous, so the aid cannot be refreshed from a prompt: the
 // body watches the table while it is open and redraws when its facts change.
 
 const PHASES: { name: string; order: string; what: string }[] = [
@@ -61,6 +61,7 @@ interface Facts {
   ready: boolean;
   year: number;
   phase: number;
+  sequentialBuild?: boolean; // the "Factory building" game option
   me?: {
     wealth: number;
     rank: number;
@@ -89,7 +90,7 @@ function facts(root: Root, playerId: string): Facts {
   const m = root.market;
   const players = root.players.copy();
   const ready = !!m && m.niches.length > 0 && !!root.clock && root.clock.timecard.length > 0;
-  const base: Facts = { ready, year: root.year, phase: root.playerAid.phase, axes: [], minSpecs: [], prices: [], timecard: 0, flipped: false, standings: [] };
+  const base: Facts = { ready, year: root.year, phase: root.playerAid.phase, sequentialBuild: root.buildOrder === "engineering", axes: [], minSpecs: [], prices: [], timecard: 0, flipped: false, standings: [] };
   if (!ready) return base;
   if (m.bottomTrack) base.axes.push({ d: m.bottomAxis.dimension, min: m.bottomAxis.min });
   if (m.leftTrack) base.axes.push({ d: m.leftAxis.dimension, min: m.leftAxis.min });
@@ -169,7 +170,7 @@ function Body({ aid, playerId }: { aid: PlayerAid; playerId: string }) {
             <ol className="aid-phases">
               {PHASES.map((p, i) => (
                 <li key={p.name} className={i + 1 === x.phase ? "now" : ""}>
-                  <b>{p.name}</b> <i>{p.order}</i>
+                  <b>{p.name}</b> <i>{i === 2 && x.sequentialBuild ? "Engineering order" : p.order}</i>
                   <span className="why">{p.what}</span>
                 </li>
               ))}

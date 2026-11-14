@@ -43,17 +43,14 @@ export default class HorselessCarriage implements Game<Player, Root> {
     name: "Horseless Carriage",
     licenseInformation: "Fan implementation; Horseless Carriage © Splotter Spellen BV 2022.",
     implementationNotes:
-      "The full game and the introductory rules (no trucks or sports cars), 3–5 players, audited rule by rule against the publisher's rulebook. " +
-      "Everyone builds at once in phase 3; when the shared supply runs short, engineering focus decides who keeps their pieces and the others rebuild. " +
-      "Where the rulebook is silent: price markers are $6, $4, $3 and $2; minimum specs have no upper limit; car meeples, sparks and spec indicators never run out; " +
-      "each colour set adds 6 research and 6 planning departments to the supply, and the two starting departments come from it; " +
-      "touching mainline sides of the same step form one manufacturing zone; floor expansions are rotated but never turned over; " +
-      "a market window may go anywhere within its dealer's specs, and sells nothing that turn if no buyer inside can be sold to; a player with no card they may play skips growing demand.",
+      "All rules implemented, including the introductory rules. " +
+      "By default everyone builds their factory at the same time: if two players want the last of a piece, the player earlier in engineering order gets it, and the other builds something else. " +
+      "The Factory building option makes players build one at a time in engineering order instead.",
     publisher: "Splotter Spellen",
     designer: "Jeroen Doumen, Joris Wiersinga",
     artist: "Jan Lipiński",
-    rulesPdfUrl: "",
-    purchaseUrl: "https://www.splotter.nl",
+    rulesPdfUrl: "https://splottercon.com/rules-horseless-carriage/",
+    purchaseUrl: "https://www.splottershop.com/products/horseless-carriage",
     publisherUrl: "https://www.splotter.nl",
     description: "Industrialists build factories and sell the first automobiles to a market whose tastes change every year.",
     boxArt,

@@ -23,11 +23,23 @@ export async function executeBuildFactory(root: Root, turn: T, mode: Mode): Prom
     p.factory.syncBenchCounts();
   }
 
-  // P3.1: everyone builds concurrently on their own panel.
-  // Each sub-turn also holds its player's reach overlays, which follow the build as it happens.
-  await turn.runParallelTurns(players, (p) => [p, p.factory.catalogue!, ...reachZones(root, p)], async (player, t) => {
-    await buildTurn(player, root, t, mode);
-  });
+  if (mode === "year" && root.buildOrder === "engineering") {
+    // P3.1, strictly (game option): one player at a time in engineering order, each building
+    // from what the players before them left in the supply, so nobody ever has to rebuild.
+    for (const player of root.engineeringOrder()) {
+      syncCatalogue(player, root);
+      await turn.createTurn([player, player.factory.catalogue!, ...reachZones(root, player)], player, async (t) => {
+        await buildTurn(player, root, t, mode);
+      });
+      for (const piece of consumeStock(player, root)) removePiece(player.factory, piece); // cannot happen: counts follow the supply
+    }
+  } else {
+    // P3.1: everyone builds concurrently on their own panel.
+    // Each sub-turn also holds its player's reach overlays, which follow the build as it happens.
+    await turn.runParallelTurns(players, (p) => [p, p.factory.catalogue!, ...reachZones(root, p)], async (player, t) => {
+      await buildTurn(player, root, t, mode);
+    });
+  }
 
   // P3.7 / UX6: true up the shared supply in engineering order. A player the stock ran out
   // on has the unpaid pieces lifted and rebuilds sequentially against what is left.

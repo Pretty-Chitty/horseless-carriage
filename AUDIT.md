@@ -56,7 +56,7 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | C17 | ✅ | `MarketBoard.ts:42` | |
 | C18 | ✅ | `chits/Niche.ts:11` | Buyers are `Car` chits. Cars sold are counters (UX8). |
 | C19 | ✅ | `MarketBoard.ts:82-88` | |
-| C20 | ✅ | `phase8GrowDemand.ts:83,109` | Created as needed, never stocked (Q4). |
+| C20 | ✅ | `phase8GrowDemand.ts:83,109` | Created as needed, never stocked (Q4, confirmed). |
 | C21 | ✅ | `PlanningOffice.ts:84-93`, `HorselessCarriage.ts:132-141` | 8 pieces in use per player, within the 10 supplied. |
 | C22 | ✅ | `chits/FloorTile.ts` | |
 | M9 | ✅ | `consts.ts:337` | Checked against the factory scan: 12×12, 5×5 bay top-right, line on top. |
@@ -71,10 +71,10 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | C29 | ✅ | `Factory.ts:193`, `phase3BuildFactory.ts:306` | An indicator's step is its station's step. |
 | M12 | ✅ | `consts.ts:216-234, 471-474` | Steps, slot badges and copies checked against the p.8 inventory (rulebook page 5 render). Badge colours and numbers match row by row. |
 | M13 | ✅ | `consts.ts:271-282`, `geometry.ts:48-55` | Sector edges checked on all three mainlines in the factory scan (A bottom, B right, C left, D top). |
-| M14 | ✅ | `consts.ts:311-322` | Green sizes checked in the scan. Other colours assumed the same (Q5). |
+| M14 | ✅ | `consts.ts:311-322` | Green sizes checked in the scan. Other colours the same (Q5, confirmed). |
 | M15 | ✅ | `consts.ts:291-295` | Checked in the scan. |
 | M16 | ✅ | `consts.ts:324` | |
-| M17 | ✅ | `consts.ts:299-300`, `SupplyArea.ts:79` | 6+6 per set (Q6, provisional). |
+| M17 | ✅ | `consts.ts:309-310`, `SupplyArea.ts:79` | 5 research + 6 planning per set (Q6, from the TTS mod). |
 | M18 | ✅ | `phase3BuildFactory.ts:306` | Unlimited, created on Add spec. |
 | C30 | 🎨 | `phase5Sell.ts:88-95` | UX7: windows are created when placed, not kept in a pile. Costs nothing. |
 | C31 | ✅ | `consts.ts:402` | |
@@ -126,7 +126,7 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | P1.2 | ✅ | `phase1Research.ts:16-20` | |
 | P1.3 | ✅ | `phase1Research.ts:21-26` | Own capacity marker, or any marker on any of the five tracks. |
 | P1.4 | ✅ | `phase1Research.ts:19,24,26` | `moved` is scoped to the turn callback, so undo is safe. |
-| P1.5 | ✅ | `phase1Research.ts:24,26-30` | Markers at the end are excluded; an action with no option is forfeited (Q10). |
+| P1.5 | ✅ | `phase1Research.ts:24,26-30` | Markers at the end are excluded; an action with no option is forfeited (Q10, confirmed). |
 | P1.6 | ✅ | `phase1Research.ts:63,69` | |
 | P1.7 | ✅ | `Root.ts:69-81` | Research is read only by access and by P7. |
 
@@ -182,7 +182,7 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | P4.5 | ✅ | `Factory.ts:167-174` | (See F1 for zones that should merge.) |
 | P4.6 | ✅ | `phase4PrintBrochures.ts:28` | |
 | P4.7 | ✅ | `phase5Sell.ts:45-47` | Sums over adjacent mainlines of the type. |
-| P4.8 | ✅ | `phase4PrintBrochures.ts:30-32`, `consts.ts:404-406` | 3 or more give L (Q13). |
+| P4.8 | ✅ | `phase4PrintBrochures.ts:30-32`, `consts.ts:404-406` | 2 or more give L (Q13, confirmed). |
 | P4.9 | ✅ | `phase4PrintBrochures.ts:31-32` | All five dimensions. |
 
 ### P5 — Sell, sell, sell!
@@ -237,7 +237,7 @@ inventory (`rules.pdf` page 5) during this audit. The row says so where it appli
 | P8.1 | ✅ | `phase8GrowDemand.ts:18` | |
 | P8.2 | ✅ | `phase8GrowDemand.ts:26-46`, `Card.ts:29-33` | `cardId` is hidden from the other seats until revealed; the log names only the quadrant. |
 | P8.3 | ✅ | `phase8GrowDemand.ts:19` | |
-| P8.4 | ✅ | `phase8GrowDemand.ts:20-23,72` | Q15. |
+| P8.4 | ✅ | `phase8GrowDemand.ts:20-23,72` | No playable card: skip (Q15, confirmed). |
 | P8.5 | ✅ | `phase8GrowDemand.ts:54-67` | Placement is correct; the display of more than 2 sparks is F4. |
 | P8.6 | ✅ | `phase8GrowDemand.ts:68` | |
 | P8.7 | ✅ | `phase8GrowDemand.ts:77-86` | `max(0, min(s, 2s − b))`. Runs before the neutral buyers, as the book orders it. |
@@ -311,7 +311,7 @@ P3.22, UX9, UX11) · 🎨 6 (C30, M24, S2, UX7, UX8, UX10) · ❌ 0.
 | Supply | Book | Code | Verdict |
 |---|---|---|---|
 | Stations, mainlines | "The number of station tiles provided is limiting, if they run out, a tile can no longer be built" (p.12) | Finite, N sets, `SupplyArea` | ✅ hard limit |
-| Research / planning departments | Part of the per-colour set returned to the box (p.8) | Finite, 6+6 per set (Q6) | ✅ (count provisional; the setup deduction is F5) |
+| Research / planning departments | Part of the per-colour set returned to the box (p.8) | Finite, 5 research + 6 planning per set (Q6) | ✅ (setup departments come from the supply, Q19) |
 | Dealerships (3), marketing (4) | "maximum of three dealerships", "maximum of four marketing departments" (p.5) | Per-player limits | ✅ |
 | Floor expansions | 6 per player (p.8), "if any remain" (p.14) | Counter, 6 | ✅ (load-bearing: ends the game, P6.3) |
 | Spec indicators | Not stated | Unlimited, created on Add (Q7) | ✅ |
@@ -455,6 +455,9 @@ Other agents were editing the render and AI files at the time.
 
 ### F5 — Unstated reading: the setup departments come out of the shared supply (S10/S16/Q6) — low, spec
 
+**Resolved 2026-11-14:** the developer confirmed the reading (Q19), and Q6 is now 5 research and 6 planning
+per set, from the TTS mod. No code change was needed.
+
 - **Code:** `executeBuildFactory(…, "setup")` runs `consumeStock` (`phase3BuildFactory.ts:31-41`),
   so N research and N planning departments leave the shared stock at setup.
 - **Book (p.8):** "Give each player one Research and one Planning department. … Finally, place the
@@ -476,6 +479,9 @@ Other agents were editing the render and AI files at the time.
   largest legal coverage contains every other legal one.
 
 ### F7 — `metadata` (known) — low
+
+**Resolved 2026-11-14:** the implementation notes were rewritten (two short sentences), `rulesPdfUrl` is
+https://splottercon.com/rules-horseless-carriage/, and `purchaseUrl` is the Splotter shop's product page.
 
 - `implementationNotes` is stale (`HorselessCarriage.ts:41`). Rewrite it from this report. Mention
   UX7, UX8, UX10, the S2 colour-by-seat simplification, the provisional Q6 count, F3 if the flip

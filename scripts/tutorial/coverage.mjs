@@ -5,6 +5,12 @@
 // on any rule the table doesn't mention, any row whose how isn't one of the three, and any shown/explained row that
 // names no step. Ids in a row may be a list ("P3.1, P3.2") or a range within one prefix ("C1–C10", "P6P.1-P6P.4").
 // Rulings (Q-…) are answers about rules, not rules, and are not counted.
+// A "Close steps: a, b, c" line in TUTORIAL.md names the steps after the last played round. A rule explained only
+// there fails unless its row says why in parentheses ("prices (a card power, read by press and hold)"): FCM's first
+// tutorial passed with managers, drinks, gardens, new restaurants and prices listed in a closing inventory (the
+// developer: "This is a great tutorial for the first 50% of the game… you have to teach it"). With several tutorials
+// in one table, name each one's close after its id: "Close steps: sustenance routes finish; overtime night-more finish";
+// a Where cell then reads "sustenance routes, lead-barista; overtime night-more".
 //   node scripts/tutorial/coverage.mjs [RULES.md] [TUTORIAL.md]
 import { readFileSync } from "node:fs";
 
@@ -12,7 +18,11 @@ const [rulesPath = "RULES.md", tutorialPath = "TUTORIAL.md"] = process.argv.slic
 // C1, P3S.1, P6P.10, G.ESHU, SP.RAIN: capitals and digits, with a digit or a dotted part
 const ID = /^[A-Z][A-Z0-9]*(?:\.[A-Z0-9]+)?$/;
 const isId = (id) => ID.test(id) && (/\d/.test(id) || id.includes("."));
-const firstCell = (line) => line.split("|")[1]?.trim() ?? "";
+// A table row's id is its first cell, or a bold id that starts it ("| **NM.5** First marketeer used | …")
+const firstCell = (line) => {
+  const cell = line.split("|")[1]?.trim() ?? "";
+  return /^\*\*([A-Z][A-Z0-9.]*)\*\*/.exec(cell)?.[1] ?? cell;
+};
 
 const rules = [];
 for (const line of readFileSync(rulesPath, "utf8").split("\n")) {
@@ -39,6 +49,24 @@ if (at < 0) {
   process.exit(1);
 }
 const section = text.slice(at).split(/\n## /)[0];
+// "a, b" → [a, b]; "tut a b, c; tut2 d" → ["tut a", "tut b", "tut c", "tut2 d"] once tut and tut2 are known tutorials
+const tutorials = new Set();
+const stepsIn = (cell) => {
+  const out = [];
+  let tut = "";
+  for (const part of cell.split(/[;,]\s*/)) {
+    const words = part.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 1 || tutorials.has(words[0])) tut = words.shift();
+    for (const w of words) out.push(tut ? `${tut} ${w}` : w);
+  }
+  return out;
+};
+const closeLine = /^Close steps:\s*(.+)$/m.exec(text)?.[1] ?? "";
+for (const group of closeLine.split(/;\s*/)) {
+  const words = group.trim().split(/\s+/);
+  if (words.length > 1 && !group.includes(",")) tutorials.add(words[0]);
+}
+const closeSteps = new Set(stepsIn(closeLine));
 const covered = new Map();
 const problems = [];
 for (const line of section.split("\n")) {
@@ -50,6 +78,11 @@ for (const line of section.split("\n")) {
   if (!["shown", "explained", "skip"].includes(kind)) problems.push(`${ids}: "${how}" is not shown, explained or skip`);
   if (kind !== "skip" && !where) problems.push(`${ids}: ${kind}, but in which step?`);
   if (kind === "skip" && !where) problems.push(`${ids}: skipped without a reason`);
+  if (kind === "explained" && where && closeSteps.size && !where.includes("(")) {
+    const steps = stepsIn(where);
+    if (steps.every((st) => closeSteps.has(st)))
+      problems.push(`${ids}: explained only in the close (${where}): play it in the lesson, or say in parentheses why a mention is enough`);
+  }
   for (const token of ids.split(/,\s*/)) for (const id of expand(token)) covered.set(id, kind);
 }
 const missing = rules.filter((id) => !covered.has(id));

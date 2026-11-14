@@ -1,0 +1,37 @@
+Copyright (c) 2026 Josh Breckman <jbreckman@prettychitty.com>
+
+TERMS AND CONDITIONS
+
+1. DEFINITIONS
+
+"Software" means the source code, object code, and associated files in this repository.
+"Commercial Use" means use primarily intended for or directed toward commercial advantage or monetary compensation, including but not limited to selling, sublicensing, or incorporating the Software into a paid product or service.
+"Licensed Publisher" means a person or entity that holds an explicit license from the original board game designer(s) or rights holder(s) to publish or distribute the physical board game implemented by the Software.
+
+2. PERMITTED USE
+
+You are free to:
+
+- Use, copy, modify, and distribute the Software for non-commercial purposes.
+- Fork and build upon the Software for non-commercial purposes.
+- As a Licensed Publisher, use the Software to promote, demonstrate, or support sales of the physical board game for which you hold a publishing license.
+
+3. CONDITIONS
+
+Any distribution of the Software or derivative works must:
+
+- Include this license in full.
+- Be distributed under these same terms (copyleft).
+- Clearly attribute the original author: Josh Breckman.
+
+4. RESTRICTIONS
+
+You may not:
+
+- Sell, sublicense, or commercially distribute the Software or any derivative work.
+- Use the Software as part of a paid product or service, except as permitted under Section 2 for Licensed Publishers.
+- Remove or alter this license or any copyright notices.
+
+5. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM USE OF THE SOFTWARE.

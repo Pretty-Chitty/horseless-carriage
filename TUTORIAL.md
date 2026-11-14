@@ -7,14 +7,21 @@ the full rules' trucks and sports cars, and hands the same match over (`end: "co
 
 ## The narrator
 
-The company's founder, in the voice of the rulebook's opening speech: bombastic, impatient, proud of
-"our brakeless bangers", sure that "if I can dream it, you can do it". They address you as the new
-director of the works. Short sentences, one clause each, for the voice.
+A mentor talking a friend through their first game, in plain spoken English: normal word order, contractions,
+"can" rather than "may", no persona jargon. Only the sign-off keeps the founder's line from the rulebook's opening
+speech, "If I can dream it, you can do it!". Short sentences, one subject each, so that each beat lands on what is
+being said.
+
+The developer rejected two earlier voices. On 2026-11-13 they rejected a "director of the works" persona and its
+padded intro ("I wanted it shorter"). On 2026-11-14 they rejected inverted, stagey phrasing ("yoda talk… things said
+backwards in a way no human would"), such as "Three markers stand there" and "When the last radiator is gone,
+nobody builds a radiator". The intro is now two sentences: who you are, and who you are up against.
 
 ## Outline
 
 Rewritten on 2026-11-03 after the developer's review of the first script ("here's a thing and here's a thing… not
-enough of explaining WHY things happen… far too few steps in a game this complicated"): 132 steps, two full years.
+enough of explaining WHY things happen… far too few steps in a game this complicated"): two full years, 174 steps
+as of 2026-11-14.
 Every stretch is split into short steps, each with its reason; a result step follows every consequential tap; each
 bot's part of a turn is its own held step; terms are taught where they are first used (price segments at the first
 sale, quadrants with the market cards, patents when Sam takes slot 1).
@@ -96,9 +103,14 @@ pass), game-end, full-game, finish-tutorial (`end: "continue"`).
 
 1–4. The first script's passes (see git history). 5. **The developer's review (2026-11-03):** the tour listed things
 without reasons; too few steps; terms zipped past. The rewrite above. The rewritten script passes `tutorial:check` (coverage; headless,
-browser-like and fast-bot replays identical, 136 steps); the developer's reading is pending.
+browser-like and fast-bot replays identical, 136 steps). 6. **The developer's listening (2026-11-13/14):**
+the intro was fluff, the narrator too slow, and "beside your name" and the clock were in one sentence while the clock
+was ringed. Fixed with a two-sentence intro, `tempo` 1.15 and one subject per sentence. Then 142 steps were rewritten
+in plain English (see The narrator).
 
-Narration is silent (`"narrator": { "provider": "none" }`, reading clock) until the developer approves the script.
+Narration (2026-11-14): Voicebox, Kokoro `am_michael` at `tempo` 1.15, 174 steps (~29 min), force-aligned with WhisperX (`align.py`),
+with `pauses` of 0.3 s at colons and 0.35 s between sentences. Kokoro reads "niche" as "nitch"; `pronounce` respells it
+"neeshe" (its render is byte-identical to the IPA /niːʃ/ for niche, niches and niche's).
 
 ## Coverage
 

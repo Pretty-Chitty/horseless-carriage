@@ -306,8 +306,8 @@ export const DEPARTMENTS: readonly DepartmentSpec[] = [
 export function department(type: DepartmentType): DepartmentSpec {
   return DEPARTMENTS.find((d) => d.type === type)!;
 }
-export const RESEARCH_DEPARTMENTS_PER_SET = 6; // Q6, provisional
-export const PLANNING_DEPARTMENTS_PER_SET = 6; // Q6, provisional
+export const RESEARCH_DEPARTMENTS_PER_SET = 5; // Q6: TTS mod stack 25 = 5 colours × 5 (Vassal agrees)
+export const PLANNING_DEPARTMENTS_PER_SET = 6; // Q6: TTS mod stack 30 = 5 colours × 6 (Vassal agrees)
 export const MARKETING_DEPARTMENTS_PER_PLAYER = 4; // C26
 export const DEALERSHIPS_PER_PLAYER = 3; // C25
 

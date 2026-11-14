@@ -63,7 +63,7 @@ process.on("uncaughtException", (e) => remember("uncaughtException")(String(e?.s
 async function playOne(n) {
   const game = new Game();
   const infos = Array.from({ length: players }, (_, i) => new PlayerInfo(`p${i}`, `Robot ${i + 1}`));
-  const match = new Match(game, infos, new EphemeralMatchStorage(`sim${n}`, true), {});
+  const match = new Match(game, infos, new EphemeralMatchStorage(`sim${n}`, true), JSON.parse(process.env.SOAK_OPTIONS ?? "{}")); // e.g. SOAK_OPTIONS={"buildOrder":"engineering"}
   match.immediateNotify = true; // headless: notify on setImmediate (engine default is a 0 ms debounce timer)
   await match.load();
   // Every seat is the game's rule-based AI (src/ai.ts), connected like a client.

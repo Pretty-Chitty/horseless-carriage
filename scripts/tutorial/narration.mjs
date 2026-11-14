@@ -37,7 +37,9 @@ export function spoken(markdown, words) {
     .replace(/^#+\s*/gm, "")
     .replace(/\n\s*[-*]\s+/g, ", ") // list items read as a list
     .replace(/^\s*[-*]\s+/gm, "")
-    .replace(/[*_`>]/g, "");
+    .replace(/[*_`>]/g, "")
+    // A zero-width space keeps the engine's splitter from ending a sentence at an abbreviation ("Inc.\u200b Burgers")
+    .replace(/\u200b/g, "");
   const clean = (w) => (w ?? "").replace(/[^a-z]/gi, "").toLowerCase();
   s = s.replace(/:([a-zA-Z0-9_-]+):/g, (m, name, at, all) => {
     const forms = words[name];

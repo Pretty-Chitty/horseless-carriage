@@ -88,7 +88,7 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
   they are buyers; placed on a mainline they track production. (p.4)
 - **C19** Each buyer requires, for the active dimensions, the spec read from the axes; and for
   each off-board dimension, that dimension's minimum spec. (p.4)
-- **C20** Supply of car meeples is not stated. Reading: unlimited. **Q4.**
+- **C20** Supply of car meeples is not stated. Unlimited (developer, Q4).
 
 ### Brands
 - **C21** 5 × 10 wooden brand pieces (one colour per player). (p.4)
@@ -156,13 +156,14 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
   mainline may be placed either side up (developer). Copies per set: 2 of each type.
 - **M14** Dealership footprints (factory pieces scan, p.16 pictures): each player's three
   dealerships are 4×3, 4×4 and 5×4, each with its own name (green: Luton 4×3, Dunstable 4×4,
-  Ellesmere Port 5×4). **Same three sizes for every colour? — Q5.**
+  Ellesmere Port 5×4). Every colour has the same three sizes (developer, Q5).
 - **M15** Department footprints: research 3×3, planning 2×3, marketing 4×3 (factory pieces
   scan; p.14/p.16 pictures agree).
 - **M16** Spec indicator footprint: 1×1, printed with the dimension's chevron and
   abbreviation on the hatching of one manufacturing step (factory pieces scan).
 - **M17** Research and planning departments in the shared supply: the p.8 inventory shows
-  two stacks of 3 of each per set. **Count per set — Q6.**
+  two stacks of 3 of each per set, but the TTS mod's stacks hold 25 research and 30 planning
+  (Vassal's supply piles plus starting tiles agree): **5 research and 6 planning per set** (Q6).
 - **M18** Spec indicators are an unlimited supply, created as needed (developer, Q7).
 
 ### Market windows
@@ -285,8 +286,8 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
 - **P1.4** A player may not move a marker a second step that they have already moved this
   phase. Another player may move a marker that someone else already moved this phase, if they
   have not moved it themselves.
-- **P1.5** A marker cannot move beyond the last space (slot 6; capacity 5). Reading: such a
-  marker is not a legal choice; a player with no legal move for an action forfeits it. **Q10.**
+- **P1.5** A marker cannot move beyond the last space (slot 6; capacity 5). Such a
+  marker is not a legal choice; a player with no legal move for an action forfeits it (developer, Q10).
 - **P1.6** If a marker reaches a space with a punch clock (M6, M23), move the timecard down one
   step.
 - **P1.7** Research grants access to stations (P3.10) and drives P7; it does not change cars
@@ -310,6 +311,8 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
 - **P3.1** Order of play: "It is advised to do most of this phase concurrently"; conflicts are
   resolved in engineering-focus order (slot 1 first). The conflict is the shared supply (P3.7)
   and patent access (P3.11) only; nothing a player builds otherwise affects another's legality.
+  The "Factory building" game option (developer, 2026-11-14) plays it strictly instead: one
+  player at a time in engineering order, each building from what is left, so nobody rebuilds.
 - **P3.2** A player may place any number of tiles, each validly placed.
 - **P3.3** Tiles placed in previous years can never be moved or removed. (Tiles placed this year
   may be rearranged until the player ends their turn.)
@@ -390,8 +393,8 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
   mainline produces (assembly capacity) cars of its type this year. (p.15 example: a dealer on
   two car mainlines "can sell twice as many cars as purple's current assembly capacity".)
 - **P4.8** Market stretch = number of marketing departments adjacent to the dealer: 0 → small
-  (2×1), 1 → medium (2×2), 2 → large (3×3). A marketing department adjacent to several dealers
-  benefits each. **3 or 4 adjacent — Q13** (reading: large).
+  (2×1), 1 → medium (2×2), 2 or more → large (3×3) (developer, Q13). A marketing department adjacent to several dealers
+  benefits each.
 - **P4.9** A dealer whose specs do not meet or exceed the minimum spec on all five dimensions,
   including off-board ones, sells nothing this year and takes no window.
 
@@ -468,8 +471,8 @@ Every id is one assertion. Quotes are the book's words. "Reading:" marks an inte
 - **P8.2** Each player plays one card face down next to one of the four quadrants.
 - **P8.3** A card may be played only if the player has placed at least (card year) floor
   expansions.
-- **P8.4** Played cards are discarded and never return. Reading: a player with no playable card
-  plays none. **Q15.**
+- **P8.4** Played cards are discarded and never return. A player with no playable card
+  plays none (developer, Q15; probably unreachable).
 - **P8.5** Quadrant by quadrant (I, II, III, IV) reveal the cards played there; for each card
   place a spark marker of the card's car type on the niche indicated (M21); a double icon
   places two sparks. A niche can hold any number of sparks.
@@ -564,19 +567,19 @@ them like rules.
 | Q1 | ✅ resolved 2026-10-17: price markers are $6, $4, $3, $2. | [6, 4, 3, 2] |
 | Q2 | ✅ resolved: no limit on a minimum spec; axis tiles are drawn (ParameterizedCanvas) for any min. | min…min+3, uncapped |
 | Q3 | ✅ resolved with Q2: minimum spec is uncapped; the indicator is drawn with any number. | Uncapped |
-| Q4 | Car meeples and spark markers: treated as unlimited (not raised as a problem by the developer). | Unlimited |
-| Q5 | Does every colour's dealership set have the same three sizes, 4×3, 4×4 and 5×4? | Yes |
-| Q6 | ✅ provisional: 6 research and 6 planning per colour set ("fine for now, exact count later"). | 6 and 6 per set |
+| Q4 | ✅ resolved 2026-11-14: car meeples and spark markers are unlimited. | Unlimited |
+| Q5 | ✅ resolved 2026-11-14: every colour's dealership set has the same three sizes, 4×3, 4×4 and 5×4. | Yes |
+| Q6 | ✅ resolved 2026-11-14 from the TTS mod (research stack 25, planning stack 30, for five colours; the Vassal module agrees): 5 research and 6 planning per colour set. | 5 and 6 per set |
 | Q7 | ✅ resolved: spec indicators are unlimited, created as needed. | Unlimited |
 | Q8 | ✅ resolved: all five decks are identical apart from colour (the p.18 picture is not to be trusted). | Identical |
 | Q9 | ✅ answered by the book (p.19): "Note the card will always be aligned with the board as shown." | Unrotated |
-| Q10 | A research action with no legal marker (all candidates at track end) — forfeited? | Forfeited |
+| Q10 | ✅ resolved 2026-11-14: a research action with no legal marker (all candidates at track end) is forfeited. | Forfeited |
 | Q11 | ✅ resolved: yes, a station may carry one indicator per slot that pictures it. | Yes, one per slot |
 | Q12 | ✅ answered by the book (p.14): "After placing all stations in the existing factory, a player must place one floor expansion." | After building |
-| Q13 | Market stretch with 3 or 4 adjacent marketing departments? | Large |
+| Q13 | ✅ resolved 2026-11-14: two or more adjacent marketing departments give the large window. | Large |
 | Q14 | Must a newly placed window cover a buyer the dealer can sell to? The book never says so (p.16–17); the developer ruled 2026-11-03 that it need not. | Any placement within specs |
-| Q15 | A player with no playable card in P8 — skip? | Skip |
-| Q16 | Which step hatching do the two scanned "Rng" indicators have (one chevron is blue-grey on B hatching, one green on A)? Is chevron colour always the dimension? | Colour = dimension |
+| Q15 | ✅ resolved 2026-11-14: a player with no playable card in P8 skips (the developer thinks it cannot happen). | Skip |
+| Q16 | ✅ resolved 2026-11-14: chevron colour is always the dimension. | Colour = dimension |
 | Q17 | ✅ reading applied 2026-11-02 (audit F1): two mainline sides of the same step that touch are one zone, since a zone is "a connected area of one type of hatching … one side of (one or more) mainlines" (p.13). | Joined |
 | Q18 | ✅ reading applied 2026-11-02 (audit F3): a floor expansion is never turned over; its back is blank, so only rotations are offered. | Rotate only |
-| Q19 | Do the two starting departments (S10) come out of the shared department supply? The book's "additional departments" (p.8) reads either way. | Yes, from the supply |
+| Q19 | ✅ resolved 2026-11-14: the two starting departments (S10) come out of the shared department supply. | Yes, from the supply |
